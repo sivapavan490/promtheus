@@ -63,6 +63,9 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+#User=prometheus
+# if we are using prometheus user. That prometheus user wants some addtional directories required. Thar directories we will not creating so we will get the error.
+# in that purpose we are using root user only for prometheus
 ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml
 Restart=on-failure
 
