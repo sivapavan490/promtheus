@@ -85,3 +85,70 @@ systemctl start prometheus
 ```
 systemctl status prometheus
 ```
+
+# NODE EXPORTER INSTALLATION. (AGENT SERVER) port no :- 9100
+
+* we want to install the node exporter agent server in requiredfor remaining nodes
+
+* using below path we can get the link of node exporter installation
+```
+https://prometheus.io/download/
+```
+
+* for example we are downloading the linux version of agent node exporter. that link is pasted below
+
+```
+https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
+```
+
+* we can install agent node exporter in another server in /opt folder
+
+```
+cd /opt
+```
+```
+https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
+```
+
+* we can extract the node exporter file in server.
+
+```
+tar -xf node_exporter-1.9.1.linux-amd64.tar.gz
+```
+* rename the file name
+
+```
+mv node_exporter-1.9.1.linux-amd64 node_exporter
+```
+
+* now we want to create a service file for node exporter
+
+```
+vim /etc/systemd/system/node_exporter,service
+```
+
+* Now cpoy and paste the node exporter service file
+
+```
+[Unit]
+Description=Node Exporter Agent
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/opt/node_exporter/node_exporter
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```
+systemctl daemon-reload
+```
+```
+systemctl start node_exporter
+```
+```
+systemctl status node_exporter
+```
