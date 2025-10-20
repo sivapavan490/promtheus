@@ -1,0 +1,4 @@
+1. Node exporter will be running contionusly in node server.
+2. When will metrics will be collected ?
+Ans:- when prometheus server will call the node exporter in server then only prometheus server will get the metrics.
+If prometheus server did not call the node supporter it will not send back the metrics.

@@ -1,4 +1,4 @@
-# promtehus installation
+# promtehus installation (9090)
 
 using below  path we can get the link of promteous installation
 
@@ -64,8 +64,8 @@ After=network-online.target
 
 [Service]
 #User=prometheus
-# if we are using prometheus user. That prometheus user wants some addtional directories required. Thar directories we will not creating so we will get the error.
-# in that purpose we are using root user only for prometheus
+# if we are using prometheus user. That prometheus user wants some addtional directories required. Those directories we will not creating in prometheus for practising purpose so we will get the error.
+# To escape those directory error that purpose we are using root user only for prometheus
 ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml
 Restart=on-failure
 
@@ -124,7 +124,7 @@ mv node_exporter-1.9.1.linux-amd64 node_exporter
 * now we want to create a service file for node exporter
 
 ```
-vim /etc/systemd/system/node_exporter,service
+vim /etc/systemd/system/node_exporter.service
 ```
 
 * Now cpoy and paste the node exporter service file
@@ -151,4 +151,114 @@ systemctl start node_exporter
 ```
 ```
 systemctl status node_exporter
+```
+* we will change the prometheus.yaml file according to our requirement like below configuration file.
+
+
+# If we want the node server metrics we want to change the prometheus.yaml configuration file according to our requiremnt like below file.
+
+```
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - "localhost:9093"
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert-rules/*.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+       # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        labels:
+          app: "prometheus"
+          name: "prometheus"
+  
+  #- job_name: 'ec2_instances'
+    # ec2_sd_configs:
+    #  - region: 'us-east-1' # Replace with your AWS region
+    #   filters:
+    #     - name: tag:Monitoring
+    #        values: 
+    #       - true
+    #    port: 9100 # Default Prometheus exporter port
+    #relabel_configs:
+    #  - source_labels: [__meta_ec2_instance_id]
+    #   target_label: instance_id # For easy filtering in alerts
+    #  
+    #  - source_labels: [__meta_ec2_tag_Name]
+    #    target_label: name
+    #
+    #  - source_labels: [__meta_ec2_private_ip]
+    #    target_label: private_ip
+
+   - job_name: "NODE-1"
+     static_configs:
+       - targets: ["172.31.39.231:9100"]
+         labels:
+           app: "NODE-1"
+           name: "NODE-1"
+
+```
+
+* INSTALLING GRAFANA port no (3000)
+#  Here we will install grafana through repo
+
+```
+wget -q -O gpg.key https://rpm.grafana.com/gpg.key
+```
+# sometimes wget cmdwill fail in that case we will use curl cmd
+
+```
+curl -O gpg.key https://rpm.grafana.com/gpg.key
+
+```
+
+# create a repo file for grafana in below path
+
+```
+vim /etc/yum.repos.d/grafana.repo
+```
+
+# now paste the below conten in this path /etc/yum.repos.d/grafana.repo
+
+```
+[grafana]
+name=grafana
+baseurl=https://rpm.grafana.com
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://rpm.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+```
+
+# To start grafanna
+
+```
+systemctl daemon-reload
+```
+```
+systemctl start grafana-server
+```
+```
+systemctl enable grafana-server
 ```
